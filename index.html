@@ -105,8 +105,12 @@
         </div>
 
         <div class="mb-3 sm:mb-4">
-            <label for="rgbInput" class="block text-gray-700 font-medium text-sm sm:text-base mb-1">RGB (R, G, B)</label>
-            <input type="text" id="rgbInput" placeholder="255, 255, 255" class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 text-sm sm:text-base">
+            <label class="block text-gray-700 font-medium text-sm sm:text-base mb-1">RGB (R, G, B)</label>
+            <div class="flex gap-2">
+                <input type="number" id="rgbR" placeholder="R" min="0" max="255" class="w-1/3 px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 text-sm sm:text-base text-center">
+                <input type="number" id="rgbG" placeholder="G" min="0" max="255" class="w-1/3 px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 text-sm sm:text-base text-center">
+                <input type="number" id="rgbB" placeholder="B" min="0" max="255" class="w-1/3 px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 text-sm sm:text-base text-center">
+            </div>
         </div>
         
         <div class="mb-3 sm:mb-4">
@@ -207,7 +211,9 @@
         const ralPrefix = "RAL ";
 
         const hexInput = document.getElementById('hexInput');
-        const rgbInput = document.getElementById('rgbInput');
+        const rgbR = document.getElementById('rgbR');
+        const rgbG = document.getElementById('rgbG');
+        const rgbB = document.getElementById('rgbB');
         const ralInput = document.getElementById('ralInput');
         const commonDecimalInput = document.getElementById('commonDecimalInput');
         const accessDecimalInput = document.getElementById('accessDecimalInput');
@@ -298,7 +304,9 @@
             const accessDec = rgbToAccessValue(rgbString);
 
             hexInput.value = hex;
-            rgbInput.value = rgbString;
+            rgbR.value = rgb[0];
+            rgbG.value = rgb[1];
+            rgbB.value = rgb[2];
             commonDecimalInput.value = commonDec;
             accessDecimalInput.value = accessDec;
             colorDisplay.style.backgroundColor = hex;
@@ -355,11 +363,14 @@
             }
         }
 
-        function updateFromRgb() {
+        function updateFromRgbInputs() {
             if (isUpdating) return;
-            const rgb = rgbInput.value.trim();
-            if (rgbToHex(rgb)) {
-                updateAllFromRgb(rgb);
+            const r = rgbR.value || 0;
+            const g = rgbG.value || 0;
+            const b = rgbB.value || 0;
+            const rgbString = `${r}, ${g}, ${b}`;
+            if (rgbToHex(rgbString)) {
+                updateAllFromRgb(rgbString);
             }
         }
         
@@ -430,7 +441,9 @@
 
         // Events
         hexInput.addEventListener('input', updateFromHex);
-        rgbInput.addEventListener('input', updateFromRgb);
+        rgbR.addEventListener('input', updateFromRgbInputs);
+        rgbG.addEventListener('input', updateFromRgbInputs);
+        rgbB.addEventListener('input', updateFromRgbInputs);
         ralInput.addEventListener('input', updateFromRal);
         commonDecimalInput.addEventListener('input', updateFromCommonDecimal);
         accessDecimalInput.addEventListener('input', updateFromAccessDecimal);
