@@ -147,8 +147,7 @@
     <div class="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden p-4 sm:p-8">
         <h2 class="text-xl sm:text-2xl font-bold text-center text-gray-800 mb-4">RAL Classic-Farbwerte</h2>
         <div id="ralList" class="overflow-y-auto max-h-[500px] border border-gray-200 rounded-xl">
-            <!-- Liste wird dynamisch gefüllt -->
-        </div>
+            </div>
     </div>
 
     <script>
@@ -326,13 +325,24 @@
             isUpdating = false;
         }
         
-        function updateFromSliders() {
+        function updateFromSliders(e) {
             if (isUpdating) return;
+            
+            // Verhindert Tastatur-Einblendung durch Entfernen des Fokus von Textfeldern
+            if (document.activeElement && document.activeElement.tagName === 'INPUT' && document.activeElement.type === 'text') {
+                document.activeElement.blur();
+            }
+
             const r = redSlider.value;
             const g = greenSlider.value;
             const b = blueSlider.value;
             const rgbString = `${r}, ${g}, ${b}`;
             updateAllFromRgb(rgbString);
+
+            // Fokus auf dem aktuellen Slider halten
+            if (e && e.target) {
+                e.target.focus();
+            }
         }
 
         function updateFromHex() {
@@ -424,9 +434,11 @@
         ralInput.addEventListener('input', updateFromRal);
         commonDecimalInput.addEventListener('input', updateFromCommonDecimal);
         accessDecimalInput.addEventListener('input', updateFromAccessDecimal);
-        redSlider.addEventListener('input', updateFromSliders);
-        greenSlider.addEventListener('input', updateFromSliders);
-        blueSlider.addEventListener('input', updateFromSliders);
+        
+        // Listener angepasst für Event-Übergabe
+        redSlider.addEventListener('input', (e) => updateFromSliders(e));
+        greenSlider.addEventListener('input', (e) => updateFromSliders(e));
+        blueSlider.addEventListener('input', (e) => updateFromSliders(e));
 
         document.addEventListener('DOMContentLoaded', () => {
             updateAllFromRgb('255, 255, 255');
