@@ -325,7 +325,7 @@
             } else {
                 const closestRal = findClosestRal(rgbString);
                 ralInput.value = ''; // Clear RAL input for non-exact match
-                ralNotification.textContent = `RAL-Näherungswert: RAL ${closestRal.code} (Abstand: ${closestRal.distance.toFixed(2)})`;
+                ralNotification.textContent = `Näherungswert: RAL ${closestRal.code} (Abstand: ${closestRal.distance.toFixed(2)})`;
                 ralNotification.classList.remove('text-black');
                 ralNotification.classList.add('text-red-500');
             }
