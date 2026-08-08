@@ -132,6 +132,11 @@
             <label for="accessDecimalInput" class="block text-gray-700 font-medium text-sm sm:text-base mb-1">Dezimalwert (Access-Konvertierung)</label>
             <input type="text" id="accessDecimalInput" placeholder="16777215" class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 text-sm sm:text-base">
         </div>
+
+        <div class="mb-3 sm:mb-4">
+            <label for="kmlInput" class="block text-gray-700 font-medium text-sm sm:text-base mb-1">KML (AABBGGRR)</label>
+            <input type="text" id="kmlInput" placeholder="FFFFFFFF" maxlength="8" class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 text-sm sm:text-base">
+        </div>
         
         <div class="mb-3 sm:mb-4 flex flex-col gap-2">
             <div>
@@ -221,6 +226,7 @@
         const ralInput = document.getElementById('ralInput');
         const commonDecimalInput = document.getElementById('commonDecimalInput');
         const accessDecimalInput = document.getElementById('accessDecimalInput');
+        const kmlInput = document.getElementById('kmlInput');
         const colorDisplay = document.getElementById('colorDisplay');
         const redSlider = document.getElementById('redSlider');
         const greenSlider = document.getElementById('greenSlider');
@@ -261,6 +267,17 @@
             const g = parts[1];
             const b = parts[2];
             return (b * 65536) + (g * 256) + r;
+        }
+
+        function rgbToKml(rgbString) {
+            const parts = rgbString.split(',').map(Number);
+            if (parts.length !== 3 || parts.some(isNaN)) return null;
+            const toHex = (c) => {
+                const hex = Math.max(0, Math.min(255, c)).toString(16);
+                return hex.length === 1 ? "0" + hex : hex;
+            };
+            // KML format uses AABBGGRR (Alpha defaults to FF for fully opaque)
+            return `FF${toHex(parts[2])}${toHex(parts[1])}${toHex(parts[0])}`.toUpperCase();
         }
 
         function decimalToRgb(decValue) {
@@ -306,6 +323,7 @@
             const hex = rgbToHex(rgbString);
             const commonDec = rgbToCommonDecimal(rgbString);
             const accessDec = rgbToAccessValue(rgbString);
+            const kmlVal = rgbToKml(rgbString);
 
             hexInput.value = hex;
             rgbR.value = rgb[0];
@@ -313,6 +331,7 @@
             rgbB.value = rgb[2];
             commonDecimalInput.value = commonDec;
             accessDecimalInput.value = accessDec;
+            kmlInput.value = kmlVal;
             colorDisplay.style.backgroundColor = hex;
 
             redSlider.value = rgb[0];
@@ -416,6 +435,23 @@
             updateAllFromRgb(rgb);
         }
 
+        function updateFromKml() {
+            if (isUpdating) return;
+            let kml = kmlInput.value.trim().toUpperCase();
+            if (kml.startsWith('#')) {
+                kml = kml.substring(1);
+            }
+            if (kml.length === 8) {
+                // KML format is AABBGGRR
+                const b = parseInt(kml.substring(4, 6), 16);
+                const g = parseInt(kml.substring(2, 4), 16);
+                const r = parseInt(kml.substring(6, 8), 16);
+                if (!isNaN(r) && !isNaN(g) && !isNaN(b)) {
+                    updateAllFromRgb(`${r}, ${g}, ${b}`);
+                }
+            }
+        }
+
         function populateRalList() {
             const ralArray = Object.keys(ralToRgb).map(key => ({
                 code: key,
@@ -451,6 +487,7 @@
         ralInput.addEventListener('input', updateFromRal);
         commonDecimalInput.addEventListener('input', updateFromCommonDecimal);
         accessDecimalInput.addEventListener('input', updateFromAccessDecimal);
+        kmlInput.addEventListener('input', updateFromKml);
         
         // Listener angepasst für Event-Übergabe
         redSlider.addEventListener('input', (e) => updateFromSliders(e));
