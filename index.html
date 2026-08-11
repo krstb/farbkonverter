@@ -35,7 +35,7 @@
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #FFB1B0;
+            background-color: #315074;
             transition: background-color 0.3s ease;
         }
 
@@ -151,6 +151,10 @@
                 <label class="block text-gray-700 font-medium text-sm sm:text-base mb-1">Blau</label>
                 <input type="range" id="blueSlider" min="0" max="255" value="255" class="bg-blue-400 focus:ring-blue-500">
             </div>
+            <div>
+                <label class="block text-gray-700 font-medium text-sm sm:text-base mb-1">Helligkeit</label>
+                <input type="range" id="brightnessSlider" min="0" max="100" value="100" class="bg-gray-400 focus:ring-gray-500">
+            </div>
         </div>
 
         <div id="colorDisplay" class="w-full h-24 sm:h-32 rounded-xl border border-gray-300 flex items-center justify-center text-lg sm:text-2xl font-bold transition duration-300 ease-in-out transform scale-100 hover:scale-105" style="background-color: #ffffff;">
@@ -231,10 +235,57 @@
         const redSlider = document.getElementById('redSlider');
         const greenSlider = document.getElementById('greenSlider');
         const blueSlider = document.getElementById('blueSlider');
+        const brightnessSlider = document.getElementById('brightnessSlider');
         const ralNotification = document.getElementById('ralNotification');
         const ralListDiv = document.getElementById('ralList');
 
         let isUpdating = false;
+        let baseRgb = [255, 255, 255]; // Speichert die unskalierte Basisfarbe für die Helligkeitsberechnung
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return [h, s, l];
+        }
+
+        function hslToRgb(h, s, l) {
+            let r, g, b;
+
+            if (s === 0) {
+                r = g = b = l;
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1/3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1/3);
+            }
+
+            return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+        }
 
         function hexToRgb(hex) {
             const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -276,7 +327,6 @@
                 const hex = Math.max(0, Math.min(255, c)).toString(16);
                 return hex.length === 1 ? "0" + hex : hex;
             };
-            // KML format uses AABBGGRR (Alpha defaults to FF for fully opaque)
             return `FF${toHex(parts[2])}${toHex(parts[1])}${toHex(parts[0])}`.toUpperCase();
         }
 
@@ -314,12 +364,18 @@
             };
         }
         
-        function updateAllFromRgb(rgbString) {
+        function updateAllFromRgb(rgbString, updateBrightness = true) {
             const rgb = rgbString.split(',').map(part => parseInt(part.trim()));
             if (rgb.length !== 3 || rgb.some(isNaN)) return;
             
             isUpdating = true;
             
+            if (updateBrightness) {
+                baseRgb = [...rgb];
+                const hsl = rgbToHsl(rgb[0], rgb[1], rgb[2]);
+                brightnessSlider.value = Math.round(hsl[2] * 100);
+            }
+
             const hex = rgbToHex(rgbString);
             const commonDec = rgbToCommonDecimal(rgbString);
             const accessDec = rgbToAccessValue(rgbString);
@@ -338,7 +394,6 @@
             greenSlider.value = rgb[1];
             blueSlider.value = rgb[2];
 
-            // Update RAL notification
             const exactRalCode = Object.keys(ralToRgb).find(key => ralToRgb[key] === rgbString);
             if (exactRalCode) {
                 ralInput.value = `${ralPrefix}${exactRalCode}`;
@@ -347,7 +402,7 @@
                 ralNotification.classList.add('text-black');
             } else {
                 const closestRal = findClosestRal(rgbString);
-                ralInput.value = ''; // Clear RAL input for non-exact match
+                ralInput.value = '';
                 ralNotification.textContent = `Näherungswert: RAL ${closestRal.code} (Abstand: ${closestRal.distance.toFixed(2)})`;
                 ralNotification.classList.remove('text-black');
                 ralNotification.classList.add('text-red-500');
@@ -359,7 +414,6 @@
         function updateFromSliders(e) {
             if (isUpdating) return;
             
-            // Verhindert Tastatur-Einblendung durch Entfernen des Fokus von Textfeldern
             if (document.activeElement && document.activeElement.tagName === 'INPUT' && document.activeElement.type === 'text') {
                 document.activeElement.blur();
             }
@@ -368,12 +422,22 @@
             const g = greenSlider.value;
             const b = blueSlider.value;
             const rgbString = `${r}, ${g}, ${b}`;
-            updateAllFromRgb(rgbString);
+            updateAllFromRgb(rgbString, true);
 
-            // Fokus auf dem aktuellen Slider halten
             if (e && e.target) {
                 e.target.focus();
             }
+        }
+
+        function updateFromBrightness() {
+            if (isUpdating) return;
+
+            const hsl = rgbToHsl(baseRgb[0], baseRgb[1], baseRgb[2]);
+            const newL = brightnessSlider.value / 100;
+            const newRgb = hslToRgb(hsl[0], hsl[1], newL);
+            const rgbString = `${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]}`;
+
+            updateAllFromRgb(rgbString, false);
         }
 
         function updateFromHex() {
@@ -382,7 +446,7 @@
             if (hex.length === 6 && !hex.startsWith('#')) hex = '#' + hex;
             const rgb = hexToRgb(hex);
             if (rgb) {
-                updateAllFromRgb(rgb);
+                updateAllFromRgb(rgb, true);
             }
         }
 
@@ -393,7 +457,7 @@
             const b = rgbB.value || 0;
             const rgbString = `${r}, ${g}, ${b}`;
             if (rgbToHex(rgbString)) {
-                updateAllFromRgb(rgbString);
+                updateAllFromRgb(rgbString, true);
             }
         }
         
@@ -405,7 +469,7 @@
             }
             const rgb = ralToRgb[ralCode];
             if (rgb) {
-                updateAllFromRgb(rgb);
+                updateAllFromRgb(rgb, true);
                 ralNotification.textContent = `RAL ${ralCode} gefunden.`;
                 ralNotification.classList.remove('text-red-500');
                 ralNotification.classList.add('text-black');
@@ -421,7 +485,7 @@
             const decValue = parseInt(commonDecimalInput.value.trim(), 10);
             const rgb = decimalToRgb(decValue);
             if (rgb) {
-                updateAllFromRgb(rgb);
+                updateAllFromRgb(rgb, true);
             }
         }
 
@@ -432,7 +496,7 @@
             const g = (decValue >> 8) & 255;
             const b = (decValue >> 16) & 255;
             const rgb = `${r}, ${g}, ${b}`;
-            updateAllFromRgb(rgb);
+            updateAllFromRgb(rgb, true);
         }
 
         function updateFromKml() {
@@ -442,12 +506,11 @@
                 kml = kml.substring(1);
             }
             if (kml.length === 8) {
-                // KML format is AABBGGRR
                 const b = parseInt(kml.substring(4, 6), 16);
                 const g = parseInt(kml.substring(2, 4), 16);
                 const r = parseInt(kml.substring(6, 8), 16);
                 if (!isNaN(r) && !isNaN(g) && !isNaN(b)) {
-                    updateAllFromRgb(`${r}, ${g}, ${b}`);
+                    updateAllFromRgb(`${r}, ${g}, ${b}`, true);
                 }
             }
         }
@@ -489,13 +552,13 @@
         accessDecimalInput.addEventListener('input', updateFromAccessDecimal);
         kmlInput.addEventListener('input', updateFromKml);
         
-        // Listener angepasst für Event-Übergabe
         redSlider.addEventListener('input', (e) => updateFromSliders(e));
         greenSlider.addEventListener('input', (e) => updateFromSliders(e));
         blueSlider.addEventListener('input', (e) => updateFromSliders(e));
+        brightnessSlider.addEventListener('input', updateFromBrightness);
 
         document.addEventListener('DOMContentLoaded', () => {
-            updateAllFromRgb('255, 255, 255');
+            updateAllFromRgb('255, 255, 255', true);
             populateRalList();
         });
     </script>
