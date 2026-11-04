@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Farbkonverter</title>
 
     <link rel="manifest" href="manifest.json">
@@ -98,7 +98,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-2 sm:p-4">
+<body class="min-h-screen flex flex-col items-center justify-center p-4 pt-4">
 
     <div class="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden p-4 sm:p-8 mb-4 sm:mb-8">
         <h1 class="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-4 sm:mb-6">Farbkonverter</h1>
@@ -240,7 +240,7 @@
         const ralListDiv = document.getElementById('ralList');
 
         let isUpdating = false;
-        let baseRgb = [255, 255, 255]; // Speichert die unskalierte Basisfarbe für die Helligkeitsberechnung
+        let baseRgb = [255, 255, 255]; 
 
         function rgbToHsl(r, g, b) {
             r /= 255; g /= 255; b /= 255;
@@ -542,7 +542,6 @@
             });
         }
 
-        // Events
         hexInput.addEventListener('input', updateFromHex);
         rgbR.addEventListener('input', updateFromRgbInputs);
         rgbG.addEventListener('input', updateFromRgbInputs);
