@@ -4,169 +4,219 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Farbkonverter</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" href="icon-192.png"> 
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#1e293b">
     <meta name="color-scheme" content="light">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <link rel="apple-touch-icon" href="icon-192.png"> 
-    
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('sw.js')
-            .catch(err => console.log('SW Fehler:', err));
-        });
-      }
-    </script>
-
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://cdn.tailwindcss.com"></script>
-
     <style>
         html {
-            background-color: #000000 !important;
+            background-color: #0f172a;
             overscroll-behavior-y: none;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             -webkit-text-size-adjust: 100%;
         }
-
         body {
             font-family: inherit;
-            background-color: #315074;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             margin: 0;
+            color: #334155;
         }
-
         input {
             font-family: inherit;
         }
-
         input[type="range"] {
             -webkit-appearance: none;
             appearance: none;
             width: 100%;
-            height: 8px;
-            background: #d1d5db;
+            height: 7px;
             outline: none;
-            opacity: 0.7;
             border-radius: 9999px;
             margin: 0;
-        }
-        input[type="range"]:hover {
-            opacity: 1;
+            cursor: pointer;
         }
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 20px;
-            height: 20px;
-            background: #60a5fa;
+            width: 18px;
+            height: 18px;
+            background: #ffffff;
             cursor: pointer;
             border-radius: 50%;
-            border: 2px solid #fff;
-            box-shadow: 0 0 2px rgba(0,0,0,0.2);
+            border: 2px solid #3b82f6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+            transition: transform 0.1s ease;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
         }
         input[type="range"]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            background: #60a5fa;
+            width: 18px;
+            height: 18px;
+            background: #ffffff;
             cursor: pointer;
             border-radius: 50%;
-            border: 2px solid #fff;
-            box-shadow: 0 0 2px rgba(0,0,0,0.2);
+            border: 2px solid #3b82f6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.25);
         }
-
         .color-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 8px 12px;
-            border-bottom: 1px solid #e5e7eb;
+            padding: 10px 14px;
+            border-bottom: 1px solid #f1f5f9;
             cursor: pointer;
+            transition: background-color 0.15s ease;
         }
-        .color-item:last-child {
-            border-bottom: none;
+        .color-item:hover {
+            background-color: #f8fafc;
         }
         .color-circle {
-            width: 40px;
-            height: 40px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
             flex-shrink: 0;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4 pt-4">
-    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden p-4 sm:p-8 mb-4 sm:mb-8">
-        <h1 class="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-4 sm:mb-6">Farbkonverter</h1>
+<body class="min-h-screen flex flex-col items-center justify-start p-2 sm:p-6 lg:p-8">
+
+    <!-- Haupt-Container -->
+    <div class="w-full max-w-4xl bg-white rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden p-3 sm:p-8 mb-4 sm:mb-6 border border-slate-100">
         
-        <div class="mb-3 sm:mb-4">
-            <label for="hexInput" class="block text-gray-700 font-medium text-sm sm:text-base mb-1">Hexadezimal (#RRGGBB)</label>
-            <input type="text" id="hexInput" placeholder="#FFFFFF" maxlength="7" class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
+        <!-- Header -->
+        <div class="text-center mb-3 sm:mb-6">
+            <h1 class="text-xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Farbkonverter</h1>
+            <p class="text-[11px] sm:text-sm text-slate-500 mt-0.5">Echtzeit-Farbwertumrechnung & RAL-Katalog</p>
         </div>
 
-        <div class="mb-3 sm:mb-4">
-            <label class="block text-gray-700 font-medium text-sm sm:text-base mb-1">RGB (R, G, B)</label>
-            <div class="flex gap-2">
-                <input type="number" id="rgbR" placeholder="R" min="0" max="255" class="w-1/3 px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base text-center">
-                <input type="number" id="rgbG" placeholder="G" min="0" max="255" class="w-1/3 px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base text-center">
-                <input type="number" id="rgbB" placeholder="B" min="0" max="255" class="w-1/3 px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base text-center">
+        <!-- 2-Spalten-Raster: dauerhaft 2-spaltig (grid-cols-2 auch am Handy) -->
+        <div class="grid grid-cols-2 gap-2 sm:gap-6 mb-3 sm:mb-6">
+            
+            <!-- SPALTE 1 -->
+            <div class="flex flex-col gap-2.5 sm:gap-4">
+                <!-- 1. RGB -->
+                <div>
+                    <label class="block text-slate-700 font-semibold text-[10px] sm:text-xs mb-1 uppercase tracking-wider truncate">
+                        RGB (Rot, Grün, Blau)
+                    </label>
+                    <div class="flex gap-1 sm:gap-2">
+                        <input type="number" id="rgbR" placeholder="R" min="0" max="255"
+                            class="w-1/3 px-1 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm font-mono text-center font-bold text-red-600 transition shadow-sm">
+                        <input type="number" id="rgbG" placeholder="G" min="0" max="255"
+                            class="w-1/3 px-1 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm font-mono text-center font-bold text-green-600 transition shadow-sm">
+                        <input type="number" id="rgbB" placeholder="B" min="0" max="255"
+                            class="w-1/3 px-1 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm font-mono text-center font-bold text-blue-600 transition shadow-sm">
+                    </div>
+                </div>
+
+                <!-- 2. Hexadezimal -->
+                <div>
+                    <label for="hexInput" class="block text-slate-700 font-semibold text-[10px] sm:text-xs mb-1 uppercase tracking-wider truncate">
+                        Hexadezimal (#RRGGBB)
+                    </label>
+                    <input type="text" id="hexInput" placeholder="#FFFFFF" maxlength="7"
+                        class="w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm font-mono font-medium transition shadow-sm uppercase">
+                </div>
+
+                <!-- 3. RAL Classic & Pastell -->
+                <div>
+                    <label for="ralInput" class="block text-slate-700 font-semibold text-[10px] sm:text-xs mb-1 uppercase tracking-wider truncate">
+                        RAL (Classic & Pastell)
+                    </label>
+                    <input type="text" id="ralInput" placeholder="RAL 1000"
+                        class="w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm font-mono transition shadow-sm">
+                    <p id="ralNotification" class="text-[10px] sm:text-xs mt-1 min-h-[1rem] font-medium transition-all text-slate-500 truncate leading-tight"></p>
+                </div>
             </div>
-        </div>
-        
-        <div class="mb-3 sm:mb-4">
-            <label for="ralInput" class="block text-gray-700 font-medium text-sm sm:text-base mb-1">RAL (Classic & Pastell)</label>
-            <input type="text" id="ralInput" placeholder="RAL 1000 oder RAL 160 80 15" class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
-            <p id="ralNotification" class="text-xs sm:text-sm mt-1 min-h-[1.25rem]"></p>
-        </div>
-        
-        <div class="mb-3 sm:mb-4">
-            <label for="commonDecimalInput" class="block text-gray-700 font-medium text-sm sm:text-base mb-1">Dezimalwert (Basis-Konvertierung)</label>
-            <input type="text" id="commonDecimalInput" placeholder="16777215" class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
+
+            <!-- SPALTE 2 -->
+            <div class="flex flex-col gap-2.5 sm:gap-4">
+                <!-- 4. Dezimalwert (Basis) -->
+                <div>
+                    <label for="commonDecimalInput" class="block text-slate-700 font-semibold text-[10px] sm:text-xs mb-1 uppercase tracking-wider truncate">
+                        Dezimal (Basis)
+                    </label>
+                    <input type="text" id="commonDecimalInput" placeholder="16777215"
+                        class="w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm font-mono transition shadow-sm">
+                </div>
+
+                <!-- 5. Dezimalwert (Access) -->
+                <div>
+                    <label for="accessDecimalInput" class="block text-slate-700 font-semibold text-[10px] sm:text-xs mb-1 uppercase tracking-wider truncate">
+                        Dezimal (Access)
+                    </label>
+                    <input type="text" id="accessDecimalInput" placeholder="16777215"
+                        class="w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm font-mono transition shadow-sm">
+                </div>
+
+                <!-- 6. KML -->
+                <div>
+                    <label for="kmlInput" class="block text-slate-700 font-semibold text-[10px] sm:text-xs mb-1 uppercase tracking-wider truncate">
+                        KML (AABBGGRR)
+                    </label>
+                    <input type="text" id="kmlInput" placeholder="FFFFFFFF" maxlength="8"
+                        class="w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm font-mono uppercase transition shadow-sm">
+                </div>
+            </div>
+
         </div>
 
-        <div class="mb-3 sm:mb-4">
-            <label for="accessDecimalInput" class="block text-gray-700 font-medium text-sm sm:text-base mb-1">Dezimalwert (Access-Konvertierung)</label>
-            <input type="text" id="accessDecimalInput" placeholder="16777215" class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
+        <!-- Schieberegler (ebenfalls dauerhaft 2-spaltig) -->
+        <div class="bg-slate-50 border border-slate-200/80 rounded-xl sm:rounded-2xl p-2.5 sm:p-5 mb-3 sm:mb-6">
+            <h3 class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Farbregler & Helligkeit</h3>
+            <div class="grid grid-cols-2 gap-2 sm:gap-4">
+                <div>
+                    <div class="flex justify-between text-[11px] sm:text-xs font-semibold text-slate-600 mb-0.5">
+                        <span>Rot</span>
+                        <span id="redValText">255</span>
+                    </div>
+                    <input type="range" id="redSlider" min="0" max="255" value="255" class="bg-gradient-to-r from-red-100 to-red-500">
+                </div>
+                <div>
+                    <div class="flex justify-between text-[11px] sm:text-xs font-semibold text-slate-600 mb-0.5">
+                        <span>Grün</span>
+                        <span id="greenValText">255</span>
+                    </div>
+                    <input type="range" id="greenSlider" min="0" max="255" value="255" class="bg-gradient-to-r from-green-100 to-green-500">
+                </div>
+                <div>
+                    <div class="flex justify-between text-[11px] sm:text-xs font-semibold text-slate-600 mb-0.5">
+                        <span>Blau</span>
+                        <span id="blueValText">255</span>
+                    </div>
+                    <input type="range" id="blueSlider" min="0" max="255" value="255" class="bg-gradient-to-r from-blue-100 to-blue-500">
+                </div>
+                <div>
+                    <div class="flex justify-between text-[11px] sm:text-xs font-semibold text-slate-600 mb-0.5">
+                        <span>Helligkeit</span>
+                        <span id="brightValText">100%</span>
+                    </div>
+                    <input type="range" id="brightnessSlider" min="0" max="100" value="100" class="bg-gradient-to-r from-slate-300 to-amber-300">
+                </div>
+            </div>
         </div>
 
-        <div class="mb-3 sm:mb-4">
-            <label for="kmlInput" class="block text-gray-700 font-medium text-sm sm:text-base mb-1">KML (AABBGGRR)</label>
-            <input type="text" id="kmlInput" placeholder="FFFFFFFF" maxlength="8" class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
-        </div>
-        
-        <div class="mb-3 sm:mb-4 flex flex-col gap-2">
-            <div>
-                <label class="block text-gray-700 font-medium text-sm sm:text-base mb-1">Rot</label>
-                <input type="range" id="redSlider" min="0" max="255" value="255" class="bg-red-400">
-            </div>
-            <div>
-                <label class="block text-gray-700 font-medium text-sm sm:text-base mb-1">Grün</label>
-                <input type="range" id="greenSlider" min="0" max="255" value="255" class="bg-green-400">
-            </div>
-            <div>
-                <label class="block text-gray-700 font-medium text-sm sm:text-base mb-1">Blau</label>
-                <input type="range" id="blueSlider" min="0" max="255" value="255" class="bg-blue-400">
-            </div>
-            <div>
-                <label class="block text-gray-700 font-medium text-sm sm:text-base mb-1">Helligkeit</label>
-                <input type="range" id="brightnessSlider" min="0" max="100" value="100" class="bg-gray-400">
-            </div>
-        </div>
-
-        <div id="colorDisplay" class="w-full h-24 sm:h-32 rounded-xl border border-gray-300 flex items-center justify-center text-lg sm:text-2xl font-bold transform scale-100 hover:scale-105" style="background-color: #ffffff;">
+        <!-- Farbmuster-Vorschaufläche -->
+        <div>
+            <div id="colorDisplay" class="w-full h-16 sm:h-24 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-inner transition-colors duration-150" style="background-color: #ffffff;"></div>
         </div>
     </div>
 
-    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden p-4 sm:p-8">
-        <h2 class="text-xl sm:text-2xl font-bold text-center text-gray-800 mb-4">RAL Classic & Pastell-Farbwerte</h2>
-        <div id="ralList" class="overflow-y-auto max-h-[500px] border border-gray-200 rounded-xl"></div>
+    <!-- RAL-Katalog -->
+    <div class="w-full max-w-4xl bg-white rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden p-3 sm:p-8 border border-slate-100 mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-3 mb-3 sm:mb-4">
+            <h2 class="text-sm sm:text-xl font-bold text-slate-800">RAL Classic & Pastell-Farbpalette</h2>
+            <div class="relative w-full sm:w-64">
+                <input type="text" id="filterRal" placeholder="Farbe suchen..." class="w-full px-3 py-1.5 text-xs sm:text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+        </div>
+        <div id="ralList" class="overflow-y-auto max-h-[300px] sm:max-h-[420px] border border-slate-200 rounded-xl sm:rounded-2xl divide-y divide-slate-100 bg-white"></div>
     </div>
 
     <script>
-        // 1. RAL Classic (216 Farben)
         const ralClassic = {
             "1000": "203, 196, 134", "1001": "207, 189, 142", "1002": "211, 180, 114", "1003": "231, 169, 58",
             "1004": "224, 151, 19",  "1005": "173, 119, 39",  "1006": "220, 147, 43",  "1007": "212, 117, 40",
@@ -175,18 +225,16 @@
             "1019": "145, 126, 107", "1020": "136, 115, 80",  "1021": "241, 189, 19",  "1023": "245, 188, 0",
             "1024": "194, 147, 65",  "1026": "255, 255, 0",   "1027": "151, 111, 0",   "1028": "252, 174, 0",
             "1032": "236, 189, 12",  "1033": "246, 170, 0",   "1034": "240, 175, 47",  "1035": "144, 135, 120",
-            "1036": "128, 100, 63",  "1037": "242, 164, 0",
-            "2000": "234, 107, 10",  "2001": "206, 75, 30",   "2002": "177, 67, 40",   "2003": "255, 107, 46",
-            "2004": "244, 76, 38",   "2005": "255, 50, 40",   "2007": "255, 112, 45",  "2008": "250, 106, 42",
-            "2009": "203, 76, 23",   "2010": "228, 84, 10",   "2011": "211, 75, 0",    "2012": "207, 72, 43",
-            "2013": "146, 61, 44",
-            "3000": "164, 38, 38",   "3001": "144, 34, 38",   "3002": "155, 35, 38",   "3003": "134, 35, 39",
-            "3004": "100, 39, 42",   "3005": "91, 35, 40",    "3007": "74, 39, 40",    "3009": "99, 46, 42",
-            "3011": "104, 37, 34",   "3012": "167, 108, 101", "3013": "131, 62, 59",   "3014": "218, 150, 148",
-            "3015": "201, 156, 161", "3016": "184, 83, 85",   "3017": "222, 105, 116", "3018": "200, 69, 74",
-            "3020": "207, 26, 39",   "3022": "199, 87, 85",   "3024": "249, 0, 0",     "3026": "255, 0, 0",
-            "3027": "175, 23, 30",   "3028": "202, 23, 23",   "3031": "179, 43, 44",   "3032": "114, 46, 53",
-            "3033": "177, 74, 69",
+            "1036": "128, 100, 63",  "1037": "242, 164, 0",   "2000": "234, 107, 10",  "2001": "206, 75, 30",
+            "2002": "177, 67, 40",   "2003": "255, 107, 46",  "2004": "244, 76, 38",   "2005": "255, 50, 40",
+            "2007": "255, 112, 45",  "2008": "250, 106, 42",  "2009": "203, 76, 23",   "2010": "228, 84, 10",
+            "2011": "211, 75, 0",    "2012": "207, 72, 43",   "2013": "146, 61, 44",   "3000": "164, 38, 38",
+            "3001": "144, 34, 38",   "3002": "155, 35, 38",   "3003": "134, 35, 39",   "3004": "100, 39, 42",
+            "3005": "91, 35, 40",    "3007": "74, 39, 40",    "3009": "99, 46, 42",    "3011": "104, 37, 34",
+            "3012": "167, 108, 101", "3013": "131, 62, 59",   "3014": "218, 150, 148", "3015": "201, 156, 161",
+            "3016": "184, 83, 85",   "3017": "222, 105, 116", "3018": "200, 69, 74",   "3020": "207, 26, 39",
+            "3022": "199, 87, 85",   "3024": "249, 0, 0",     "3026": "255, 0, 0",     "3027": "175, 23, 30",
+            "3028": "202, 23, 23",   "3031": "179, 43, 44",   "3032": "114, 46, 53",   "3033": "177, 74, 69",
             "4001": "128, 77, 112",  "4002": "127, 48, 85",   "4003": "216, 126, 167", "4004": "118, 43, 77",
             "4005": "70, 64, 94",    "4006": "158, 48, 103",  "4007": "70, 50, 70",    "4008": "153, 50, 101",
             "4009": "125, 99, 122",  "4010": "188, 76, 126",  "4011": "110, 99, 134",  "4012": "107, 107, 126",
@@ -196,73 +244,77 @@
             "5013": "31, 55, 77",    "5014": "93, 117, 142",  "5015": "23, 93, 146",   "5017": "0, 89, 128",
             "5018": "50, 140, 140",  "5019": "28, 75, 111",   "5020": "0, 67, 92",     "5021": "0, 94, 112",
             "5022": "40, 45, 77",    "5023": "70, 121, 143",  "5024": "110, 152, 172", "5025": "12, 101, 128",
-            "5026": "16, 44, 87",
-            "6000": "51, 87, 81",    "6001": "55, 96, 66",    "6002": "41, 88, 46",    "6003": "72, 80, 62",
-            "6004": "38, 64, 57",    "6005": "37, 63, 56",    "6006": "53, 62, 59",    "6007": "44, 55, 50",
-            "6008": "64, 62, 51",    "6009": "44, 53, 47",    "6010": "77, 110, 55",   "6011": "93, 115, 87",
-            "6012": "37, 51, 51",    "6013": "86, 85, 68",    "6014": "64, 59, 49",    "6015": "53, 57, 56",
-            "6016": "38, 84, 72",    "6017": "77, 134, 78",   "6018": "90, 169, 61",   "6019": "173, 203, 141",
-            "6020": "53, 61, 52",    "6021": "145, 167, 133", "6022": "43, 40, 36",    "6024": "0, 112, 86",
-            "6025": "109, 123, 67",  "6026": "0, 69, 62",     "6027": "117, 168, 175", "6028": "36, 125, 96",
-            "6029": "0, 102, 68",    "6032": "0, 145, 92",    "6033": "121, 140, 152", "6034": "100, 155, 178",
-            "6035": "24, 65, 59",    "6036": "37, 59, 56",    "6037": "27, 85, 85",    "6038": "0, 255, 0",
-            "7000": "131, 143, 149", "7001": "131, 139, 140", "7002": "112, 116, 105", "7003": "119, 122, 106",
-            "7004": "153, 153, 153", "7005": "91, 98, 93",    "7006": "109, 102, 94",  "7008": "105, 97, 82",
-            "7009": "79, 83, 79",    "7010": "78, 82, 80",    "7011": "76, 82, 86",    "7012": "75, 80, 81",
-            "7013": "70, 68, 64",    "7015": "81, 84, 88",    "7016": "53, 61, 64",    "7021": "45, 49, 53",
-            "7022": "57, 56, 51",    "7023": "131, 129, 114", "7024": "64, 68, 71",    "7026": "58, 66, 73",
-            "7030": "144, 142, 136", "7031": "100, 107, 114", "7032": "153, 153, 140", "7033": "126, 131, 119",
-            "7034": "134, 126, 105", "7035": "199, 201, 195", "7036": "145, 143, 143", "7037": "119, 122, 120",
-            "7038": "149, 155, 152", "7039": "74, 76, 75",    "7040": "117, 121, 125", "7042": "119, 124, 127",
-            "7043": "81, 82, 81",    "7044": "155, 161, 161", "7045": "156, 159, 160", "7046": "125, 129, 131",
-            "7047": "212, 214, 215", "7048": "104, 110, 108",
-            "8000": "144, 115, 78",  "8001": "130, 94, 68",   "8002": "108, 79, 63",   "8003": "127, 91, 68",
-            "8004": "132, 73, 50",   "8007": "103, 76, 53",   "8008": "90, 68, 49",    "8011": "97, 68, 55",
-            "8012": "76, 44, 38",    "8014": "69, 52, 47",    "8015": "90, 54, 42",    "8016": "68, 45, 38",
-            "8017": "74, 49, 44",    "8019": "43, 44, 43",    "8022": "49, 47, 44",    "8023": "143, 115, 87",
-            "8024": "124, 88, 64",   "8025": "120, 93, 73",   "8028": "81, 57, 43",    "8029": "129, 69, 51",
-            "9001": "244, 239, 230", "9002": "233, 230, 219", "9003": "243, 243, 240", "9004": "42, 43, 44",
-            "9005": "0, 0, 0",       "9006": "169, 172, 171", "9007": "133, 138, 140", "9010": "255, 255, 255",
-            "9011": "41, 41, 43",    "9016": "246, 246, 242", "9017": "69, 69, 69",    "9018": "214, 215, 209",
-            "9021": "42, 44, 45",    "9022": "139, 140, 140", "9023": "121, 124, 126"
+            "5026": "16, 44, 87",    "6000": "51, 87, 81",    "6001": "55, 96, 66",    "6002": "41, 88, 46",
+            "6003": "72, 80, 62",    "6004": "38, 64, 57",    "6005": "37, 63, 56",    "6006": "53, 62, 59",
+            "6007": "44, 55, 50",    "6008": "64, 62, 51",    "6009": "44, 53, 47",    "6010": "77, 110, 55",
+            "6011": "93, 115, 87",   "6012": "37, 51, 51",    "6013": "86, 85, 68",    "6014": "64, 59, 49",
+            "6015": "53, 57, 56",    "6016": "38, 84, 72",    "6017": "77, 134, 78",   "6018": "90, 169, 61",
+            "6019": "173, 203, 141", "6020": "53, 61, 52",    "6021": "145, 167, 133", "6022": "43, 40, 36",
+            "6024": "0, 112, 86",    "6025": "109, 123, 67",  "6026": "0, 69, 62",     "6027": "117, 168, 175",
+            "6028": "36, 125, 96",   "6029": "0, 102, 68",    "6032": "0, 145, 92",    "6033": "121, 140, 152",
+            "6034": "100, 155, 178", "6035": "24, 65, 59",    "6036": "37, 59, 56",    "6037": "27, 85, 85",
+            "6038": "0, 255, 0",     "7000": "131, 143, 149", "7001": "131, 139, 140", "7002": "112, 116, 105",
+            "7003": "119, 122, 106", "7004": "153, 153, 153", "7005": "91, 98, 93",    "7006": "109, 102, 94",
+            "7008": "105, 97, 82",   "7009": "79, 83, 79",    "7010": "78, 82, 80",    "7011": "76, 82, 86",
+            "7012": "75, 80, 81",    "7013": "70, 68, 64",    "7015": "81, 84, 88",    "7016": "53, 61, 64",
+            "7021": "45, 49, 53",    "7022": "57, 56, 51",    "7023": "131, 129, 114", "7024": "64, 68, 71",
+            "7026": "58, 66, 73",    "7030": "144, 142, 136", "7031": "100, 107, 114", "7032": "153, 153, 140",
+            "7033": "126, 131, 119", "7034": "134, 126, 105", "7035": "199, 201, 195", "7036": "145, 143, 143",
+            "7037": "119, 122, 120", "7038": "149, 155, 152", "7039": "74, 76, 75",    "7040": "117, 121, 125",
+            "7042": "119, 124, 127", "7043": "81, 82, 81",    "7044": "155, 161, 161", "7045": "156, 159, 160",
+            "7046": "125, 129, 131", "7047": "212, 214, 215", "7048": "104, 110, 108", "8000": "144, 115, 78",
+            "8001": "130, 94, 68",   "8002": "108, 79, 63",   "8003": "127, 91, 68",   "8004": "132, 73, 50",
+            "8007": "103, 76, 53",   "8008": "90, 68, 49",    "8011": "97, 68, 55",    "8012": "76, 44, 38",
+            "8014": "69, 52, 47",    "8015": "90, 54, 42",    "8016": "68, 45, 38",    "8017": "74, 49, 44",
+            "8019": "43, 44, 43",    "8022": "49, 47, 44",    "8023": "143, 115, 87",  "8024": "124, 88, 64",
+            "8025": "120, 93, 73",   "8028": "81, 57, 43",    "8029": "129, 69, 51",   "9001": "244, 239, 230",
+            "9002": "233, 230, 219", "9003": "243, 243, 240", "9004": "42, 43, 44",    "9005": "0, 0, 0",
+            "9006": "169, 172, 171", "9007": "133, 138, 140", "9010": "255, 255, 255", "9011": "41, 41, 43",
+            "9016": "246, 246, 242", "9017": "69, 69, 69",    "9018": "214, 215, 209", "9021": "42, 44, 45",
+            "9022": "139, 140, 140", "9023": "121, 124, 126"
         };
 
-        // 2. RAL Design Pastelltöne
         const ralPastel = {
-            "010 85 15": "244, 204, 209", // Zartes Puderrosa
-            "020 85 20": "250, 198, 196", // Pastell-Lachs
-            "090 90 20": "245, 230, 180", // Sanftes Buttergelb
-            "100 90 10": "236, 230, 213", // Pastell-Vanille
-            "130 85 15": "205, 224, 200", // Pastell-Salbei
-            "160 80 15": "183, 213, 200", // Zartes Mint
-            "240 85 10": "205, 219, 226", // Rauchiges Pastellblau
-            "260 80 15": "189, 207, 226", // Babyblau
-            "310 80 15": "216, 200, 219", // Helles Flieder
-            "330 80 10": "217, 199, 207"  // Zartes Mauve
+            "010 85 15": "244, 204, 209",
+            "020 85 20": "250, 198, 196",
+            "090 90 20": "245, 230, 180",
+            "100 90 10": "236, 230, 213",
+            "130 85 15": "205, 224, 200",
+            "160 80 15": "183, 213, 200",
+            "240 85 10": "205, 219, 226",
+            "260 80 15": "189, 207, 226",
+            "310 80 15": "216, 200, 219",
+            "330 80 10": "217, 199, 207"
         };
 
-        // 3. Zusammengeführtes Verzeichnis
         const ralToRgb = { ...ralClassic, ...ralPastel };
         const ralPrefix = "RAL ";
 
-        const hexInput = document.getElementById('hexInput');
         const rgbR = document.getElementById('rgbR');
         const rgbG = document.getElementById('rgbG');
         const rgbB = document.getElementById('rgbB');
+        const hexInput = document.getElementById('hexInput');
         const ralInput = document.getElementById('ralInput');
         const commonDecimalInput = document.getElementById('commonDecimalInput');
         const accessDecimalInput = document.getElementById('accessDecimalInput');
         const kmlInput = document.getElementById('kmlInput');
         const colorDisplay = document.getElementById('colorDisplay');
+
         const redSlider = document.getElementById('redSlider');
         const greenSlider = document.getElementById('greenSlider');
         const blueSlider = document.getElementById('blueSlider');
         const brightnessSlider = document.getElementById('brightnessSlider');
+        const redValText = document.getElementById('redValText');
+        const greenValText = document.getElementById('greenValText');
+        const blueValText = document.getElementById('blueValText');
+        const brightValText = document.getElementById('brightValText');
+
         const ralNotification = document.getElementById('ralNotification');
         const ralListDiv = document.getElementById('ralList');
+        const filterRal = document.getElementById('filterRal');
 
         let isUpdating = false;
-        let baseRgb = [255, 255, 255]; 
+        let baseRgb = [255, 255, 255];
 
         function rgbToHsl(r, g, b) {
             r /= 255; g /= 255; b /= 255;
@@ -297,7 +349,6 @@
                     if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
                     return p;
                 };
-
                 const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
                 const p = 2 * l - q;
                 r = hue2rgb(p, q, h + 1/3);
@@ -373,13 +424,13 @@
             }
             return { code: closestCode, distance: minDistance };
         }
-                
+
         function updateAllFromRgb(rgbString, updateBrightness = true) {
             const rgb = rgbString.split(',').map(part => parseInt(part.trim()));
             if (rgb.length !== 3 || rgb.some(isNaN)) return;
-                        
+
             isUpdating = true;
-                        
+
             if (updateBrightness) {
                 baseRgb = [...rgb];
                 const hsl = rgbToHsl(rgb[0], rgb[1], rgb[2]);
@@ -391,66 +442,59 @@
             const accessDec = rgbToAccessValue(rgbString);
             const kmlVal = rgbToKml(rgbString);
 
-            hexInput.value = hex;
             rgbR.value = rgb[0];
             rgbG.value = rgb[1];
             rgbB.value = rgb[2];
+            hexInput.value = hex;
             commonDecimalInput.value = commonDec;
             accessDecimalInput.value = accessDec;
             kmlInput.value = kmlVal;
-            colorDisplay.style.backgroundColor = hex;
 
             redSlider.value = rgb[0];
             greenSlider.value = rgb[1];
             blueSlider.value = rgb[2];
+            redValText.textContent = rgb[0];
+            greenValText.textContent = rgb[1];
+            blueValText.textContent = rgb[2];
+            brightValText.textContent = `${brightnessSlider.value}%`;
+
+            colorDisplay.style.backgroundColor = hex;
 
             const exactRalCode = Object.keys(ralToRgb).find(key => ralToRgb[key] === rgbString);
             if (exactRalCode) {
                 ralInput.value = `${ralPrefix}${exactRalCode}`;
-                ralNotification.textContent = 'RAL-Farbe gefunden!';
-                ralNotification.className = 'text-xs sm:text-sm mt-1 min-h-[1.25rem] text-black';
+                ralNotification.textContent = '✓ Exakte RAL-Farbe!';
+                ralNotification.className = 'text-[10px] sm:text-xs mt-1 min-h-[1rem] font-medium text-emerald-600 truncate leading-tight';
             } else {
                 const closestRal = findClosestRal(rgbString);
                 ralInput.value = '';
-                ralNotification.textContent = `Näherungswert: RAL ${closestRal.code} (Abstand: ${closestRal.distance.toFixed(2)})`;
-                ralNotification.className = 'text-xs sm:text-sm mt-1 min-h-[1.25rem] text-red-500';
+                ralNotification.textContent = `~ RAL ${closestRal.code} (Abst: ${closestRal.distance.toFixed(1)})`;
+                ralNotification.className = 'text-[10px] sm:text-xs mt-1 min-h-[1rem] font-medium text-amber-600 truncate leading-tight';
             }
 
             try {
                 localStorage.setItem('savedColor', rgbString);
             } catch (e) {
-                console.warn('localStorage nicht verfügbar:', e);
+                console.warn(e);
             }
 
             isUpdating = false;
         }
-                
+
         function updateFromSliders(e) {
             if (isUpdating) return;
-            if (document.activeElement && document.activeElement.tagName === 'INPUT' && document.activeElement.type === 'text') {
-                document.activeElement.blur();
-            }
-
             const r = redSlider.value;
             const g = greenSlider.value;
             const b = blueSlider.value;
-            const rgbString = `${r}, ${g}, ${b}`;
-            updateAllFromRgb(rgbString, true);
-
-            if (e && e.target) {
-                e.target.focus();
-            }
+            updateAllFromRgb(`${r}, ${g}, ${b}`, true);
         }
 
         function updateFromBrightness() {
             if (isUpdating) return;
-
             const hsl = rgbToHsl(baseRgb[0], baseRgb[1], baseRgb[2]);
             const newL = brightnessSlider.value / 100;
             const newRgb = hslToRgb(hsl[0], hsl[1], newL);
-            const rgbString = `${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]}`;
-
-            updateAllFromRgb(rgbString, false);
+            updateAllFromRgb(`${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]}`, false);
         }
 
         function updateFromHex() {
@@ -458,48 +502,39 @@
             let hex = hexInput.value.trim().toUpperCase();
             if (hex.length === 6 && !hex.startsWith('#')) hex = '#' + hex;
             const rgb = hexToRgb(hex);
-            if (rgb) {
-                updateAllFromRgb(rgb, true);
-            }
+            if (rgb) updateAllFromRgb(rgb, true);
         }
 
         function updateFromRgbInputs() {
             if (isUpdating) return;
-            const r = rgbR.value || 0;
-            const g = rgbG.value || 0;
-            const b = rgbB.value || 0;
-            const rgbString = `${r}, ${g}, ${b}`;
-            if (rgbToHex(rgbString)) {
-                updateAllFromRgb(rgbString, true);
-            }
+            const r = Math.min(255, Math.max(0, parseInt(rgbR.value) || 0));
+            const g = Math.min(255, Math.max(0, parseInt(rgbG.value) || 0));
+            const b = Math.min(255, Math.max(0, parseInt(rgbB.value) || 0));
+            updateAllFromRgb(`${r}, ${g}, ${b}`, true);
         }
-                
+
         function updateFromRal() {
             if (isUpdating) return;
             let ralCode = ralInput.value.trim().toUpperCase();
             if (ralCode.startsWith(ralPrefix.toUpperCase())) {
                 ralCode = ralCode.substring(ralPrefix.length).trim();
             }
-            
-            // Unterstützt 4-stellige Codes und 7-stellige Pastell-Codes ("010 85 15")
             const rgb = ralToRgb[ralCode];
             if (rgb) {
                 updateAllFromRgb(rgb, true);
                 ralNotification.textContent = `RAL ${ralCode} gefunden.`;
-                ralNotification.className = 'text-xs sm:text-sm mt-1 min-h-[1.25rem] text-black';
+                ralNotification.className = 'text-[10px] sm:text-xs mt-1 min-h-[1rem] font-medium text-emerald-600 truncate leading-tight';
             } else {
-                ralNotification.textContent = 'RAL-Farbe nicht in der Datenbank.';
-                ralNotification.className = 'text-xs sm:text-sm mt-1 min-h-[1.25rem] text-red-500';
+                ralNotification.textContent = 'Nicht in Datenbank.';
+                ralNotification.className = 'text-[10px] sm:text-xs mt-1 min-h-[1rem] font-medium text-rose-500 truncate leading-tight';
             }
         }
-                
+
         function updateFromCommonDecimal() {
             if (isUpdating) return;
             const decValue = parseInt(commonDecimalInput.value.trim(), 10);
             const rgb = decimalToRgb(decValue);
-            if (rgb) {
-                updateAllFromRgb(rgb, true);
-            }
+            if (rgb) updateAllFromRgb(rgb, true);
         }
 
         function updateFromAccessDecimal() {
@@ -508,16 +543,13 @@
             const r = decValue & 255;
             const g = (decValue >> 8) & 255;
             const b = (decValue >> 16) & 255;
-            const rgb = `${r}, ${g}, ${b}`;
-            updateAllFromRgb(rgb, true);
+            updateAllFromRgb(`${r}, ${g}, ${b}`, true);
         }
 
         function updateFromKml() {
             if (isUpdating) return;
             let kml = kmlInput.value.trim().toUpperCase();
-            if (kml.startsWith('#')) {
-                kml = kml.substring(1);
-            }
+            if (kml.startsWith('#')) kml = kml.substring(1);
             if (kml.length === 8) {
                 const b = parseInt(kml.substring(4, 6), 16);
                 const g = parseInt(kml.substring(2, 4), 16);
@@ -528,27 +560,31 @@
             }
         }
 
-        function populateRalList() {
+        function populateRalList(filter = '') {
             const ralArray = Object.keys(ralToRgb).map(key => ({
                 code: key,
                 rgb: ralToRgb[key],
             }));
 
-            // Natürliche alphanumerische Sortierung (handhabt sowohl 4-stellig als auch Leerzeichen sauber)
             ralArray.sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true }));
+            const filtered = ralArray.filter(item => item.code.toLowerCase().includes(filter.toLowerCase()));
 
             const fragment = document.createDocumentFragment();
-            ralArray.forEach(color => {
+            filtered.forEach(color => {
                 const hexString = rgbToHex(color.rgb);
                 const itemDiv = document.createElement('div');
-                itemDiv.className = 'color-item hover:bg-gray-100';
+                itemDiv.className = 'color-item flex items-center justify-between';
                 itemDiv.innerHTML = `
-                    <div class="color-circle" style="background-color: ${hexString};"></div>
-                    <span class="text-sm sm:text-base text-gray-800 font-medium">RAL ${color.code}</span>
+                    <div class="flex items-center gap-2.5 sm:gap-3">
+                        <div class="color-circle" style="background-color: ${hexString};"></div>
+                        <span class="text-xs sm:text-sm text-slate-700 font-semibold">RAL ${color.code}</span>
+                    </div>
+                    <span class="text-[11px] sm:text-xs font-mono text-slate-400">${hexString}</span>
                 `;
                 itemDiv.addEventListener('click', () => {
                     ralInput.value = `RAL ${color.code}`;
                     updateFromRal();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
                 fragment.appendChild(itemDiv);
             });
@@ -556,26 +592,29 @@
             ralListDiv.appendChild(fragment);
         }
 
-        hexInput.addEventListener('input', updateFromHex);
         rgbR.addEventListener('input', updateFromRgbInputs);
         rgbG.addEventListener('input', updateFromRgbInputs);
         rgbB.addEventListener('input', updateFromRgbInputs);
+        hexInput.addEventListener('input', updateFromHex);
         ralInput.addEventListener('input', updateFromRal);
         commonDecimalInput.addEventListener('input', updateFromCommonDecimal);
         accessDecimalInput.addEventListener('input', updateFromAccessDecimal);
         kmlInput.addEventListener('input', updateFromKml);
-                
-        redSlider.addEventListener('input', (e) => updateFromSliders(e));
-        greenSlider.addEventListener('input', (e) => updateFromSliders(e));
-        blueSlider.addEventListener('input', (e) => updateFromSliders(e));
+
+        redSlider.addEventListener('input', updateFromSliders);
+        greenSlider.addEventListener('input', updateFromSliders);
+        blueSlider.addEventListener('input', updateFromSliders);
         brightnessSlider.addEventListener('input', updateFromBrightness);
 
-        // Synchron sofort ausführen, ohne Verzögerung
+        filterRal.addEventListener('input', (e) => {
+            populateRalList(e.target.value.trim());
+        });
+
         let initialColor = '255, 255, 255';
         try {
-            initialColor = localStorage.getItem('savedColor') || '255, 255, 255';
+            initialColor = localStorage.getItem('savedColor') || '59, 130, 246';
         } catch (e) {
-            console.warn('localStorage nicht lesbar:', e);
+            console.warn(e);
         }
         updateAllFromRgb(initialColor, true);
         populateRalList();
