@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" href="icon-192.png"> 
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="apple-touch-icon" href="icon-192.png">
-	<meta name="theme-color" content="#1e293b">
+    <meta name="theme-color" content="#1e293b">
     <meta name="color-scheme" content="light">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -93,10 +93,10 @@
         <!-- Header -->
         <div class="text-center mb-3 sm:mb-6">
             <h1 class="text-xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Farbkonverter</h1>
-            <p class="text-[11px] sm:text-sm text-slate-500 mt-0.5">Echtzeit-Farbwertumrechnung & RAL-Katalog</p>
+            <p class="text-[11px] sm:text-sm text-slate-500 mt-0.5">Farbwertumrechnung & RAL-Katalog</p>
         </div>
 
-        <!-- 2-Spalten-Raster: dauerhaft 2-spaltig (grid-cols-2 auch am Handy) -->
+        <!-- 2-Spalten-Raster -->
         <div class="grid grid-cols-2 gap-2 sm:gap-6 mb-3 sm:mb-6">
             
             <!-- SPALTE 1 -->
@@ -168,7 +168,7 @@
 
         </div>
 
-        <!-- Schieberegler (ebenfalls dauerhaft 2-spaltig) -->
+        <!-- Schieberegler -->
         <div class="bg-slate-50 border border-slate-200/80 rounded-xl sm:rounded-2xl p-2.5 sm:p-5 mb-3 sm:mb-6">
             <h3 class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Farbregler & Helligkeit</h3>
             <div class="grid grid-cols-2 gap-2 sm:gap-4">
@@ -211,11 +211,8 @@
 
     <!-- RAL-Katalog -->
     <div class="w-full max-w-4xl bg-white rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden p-3 sm:p-8 border border-slate-100 mb-6">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-3 mb-3 sm:mb-4">
+        <div class="mb-3 sm:mb-4">
             <h2 class="text-sm sm:text-xl font-bold text-slate-800">RAL Classic & Pastell-Farbpalette</h2>
-            <div class="relative w-full sm:w-64">
-                <input type="text" id="filterRal" placeholder="Farbe suchen..." class="w-full px-3 py-1.5 text-xs sm:text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
         </div>
         <div id="ralList" class="overflow-y-auto max-h-[300px] sm:max-h-[420px] border border-slate-200 rounded-xl sm:rounded-2xl divide-y divide-slate-100 bg-white"></div>
     </div>
@@ -258,7 +255,7 @@
             "6028": "36, 125, 96",   "6029": "0, 102, 68",    "6032": "0, 145, 92",    "6033": "121, 140, 152",
             "6034": "100, 155, 178", "6035": "24, 65, 59",    "6036": "37, 59, 56",    "6037": "27, 85, 85",
             "6038": "0, 255, 0",     "7000": "131, 143, 149", "7001": "131, 139, 140", "7002": "112, 116, 105",
-            "7003": "119, 122, 106", "7004": "153, 153, 153", "7005": "91, 98, 93",    "7006": "109, 102, 94",
+            "7003": "119, 122, 106", "7004": "153, 153, 153", "7005": "91, 98, 93",   "7006": "109, 102, 94",
             "7008": "105, 97, 82",   "7009": "79, 83, 79",    "7010": "78, 82, 80",    "7011": "76, 82, 86",
             "7012": "75, 80, 81",    "7013": "70, 68, 64",    "7015": "81, 84, 88",    "7016": "53, 61, 64",
             "7021": "45, 49, 53",    "7022": "57, 56, 51",    "7023": "131, 129, 114", "7024": "64, 68, 71",
@@ -272,7 +269,7 @@
             "8014": "69, 52, 47",    "8015": "90, 54, 42",    "8016": "68, 45, 38",    "8017": "74, 49, 44",
             "8019": "43, 44, 43",    "8022": "49, 47, 44",    "8023": "143, 115, 87",  "8024": "124, 88, 64",
             "8025": "120, 93, 73",   "8028": "81, 57, 43",    "8029": "129, 69, 51",   "9001": "244, 239, 230",
-            "9002": "233, 230, 219", "9003": "243, 243, 240", "9004": "42, 43, 44",    "9005": "0, 0, 0",
+            "9002": "233, 230, 219", "9003": "243, 243, 240", "9004": "42, 43, 44",   "9005": "0, 0, 0",
             "9006": "169, 172, 171", "9007": "133, 138, 140", "9010": "255, 255, 255", "9011": "41, 41, 43",
             "9016": "246, 246, 242", "9017": "69, 69, 69",    "9018": "214, 215, 209", "9021": "42, 44, 45",
             "9022": "139, 140, 140", "9023": "121, 124, 126"
@@ -315,7 +312,6 @@
 
         const ralNotification = document.getElementById('ralNotification');
         const ralListDiv = document.getElementById('ralList');
-        const filterRal = document.getElementById('filterRal');
 
         let isUpdating = false;
         let baseRgb = [255, 255, 255];
@@ -564,27 +560,25 @@
             }
         }
 
-        function populateRalList(filter = '') {
+        function populateRalList() {
             const ralArray = Object.keys(ralToRgb).map(key => ({
                 code: key,
                 rgb: ralToRgb[key],
             }));
 
             ralArray.sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true }));
-            const filtered = ralArray.filter(item => item.code.toLowerCase().includes(filter.toLowerCase()));
 
             const fragment = document.createDocumentFragment();
-            filtered.forEach(color => {
+            ralArray.forEach(color => {
                 const hexString = rgbToHex(color.rgb);
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'color-item flex items-center justify-between';
                 itemDiv.innerHTML = `
-                    <div class="flex items-center gap-2.5 sm:gap-3">
-                        <div class="color-circle" style="background-color: ${hexString};"></div>
-                        <span class="text-xs sm:text-sm text-slate-700 font-semibold">RAL ${color.code}</span>
-                    </div>
-                    <span class="text-[11px] sm:text-xs font-mono text-slate-400">${hexString}</span>
-                `;
+    <div class="flex items-center gap-2.5 sm:gap-3">
+        <div class="color-circle" style="background-color: ${hexString};"></div>
+        <span class="text-xs sm:text-sm text-slate-700 font-semibold">RAL ${color.code}</span>
+    </div>
+`;
                 itemDiv.addEventListener('click', () => {
                     ralInput.value = `RAL ${color.code}`;
                     updateFromRal();
@@ -610,18 +604,10 @@
         blueSlider.addEventListener('input', updateFromSliders);
         brightnessSlider.addEventListener('input', updateFromBrightness);
 
-        filterRal.addEventListener('input', (e) => {
-            populateRalList(e.target.value.trim());
-        });
-
-        let initialColor = '255, 255, 255';
-        try {
-            initialColor = localStorage.getItem('savedColor') || '59, 130, 246';
-        } catch (e) {
-            console.warn(e);
-        }
-        updateAllFromRgb(initialColor, true);
+        // Initialisierung
         populateRalList();
+        const savedColor = localStorage.getItem('savedColor') || '255, 255, 255';
+        updateAllFromRgb(savedColor, true);
     </script>
 </body>
 </html>
